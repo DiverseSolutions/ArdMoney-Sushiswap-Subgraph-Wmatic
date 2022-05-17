@@ -54,7 +54,7 @@ type Token @entity {
   pairQuote: [Pair!]! @derivedFrom(field: "token1")
 
   # mnt
-  mnt: BigDecimal
+  mnt: BigDecimal!
 }
 
 type Pair @entity {

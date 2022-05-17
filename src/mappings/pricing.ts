@@ -54,8 +54,9 @@ export function getEthPriceInUSD(): BigDecimal {
 // token where amounts should contribute to tracked volume and liquidity
 let WHITELIST: string[] = [
   // '0xaf7acb54a773f6c6a4169654eaa8fad755468f50' // WMATIC
-  '0xd26adf1fb375a08760aed4a5bcdd8527c7e191b1', // ARDX
-  MONT_ADDRESS, // MONT
+  // '0xd26adf1fb375a08760aed4a5bcdd8527c7e191b1', // ARDX
+  '0xFC509bDc93c99BA9006115394E24f90dA54CD83b', // ARDM
+  MONT_ADDRESS // MONT
 ]
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
@@ -68,17 +69,6 @@ export function findMntPerToken(token: Token): BigDecimal {
   if (token.id == MONT_ADDRESS) {
     return ONE_BD
   }
-
-  // let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(MONT_ADDRESS))
-  // if (pairAddress.toHexString() != ADDRESS_ZERO) {
-  //   let pair = Pair.load(pairAddress.toHexString())
-
-  //   if (pair.token0 == MONT_ADDRESS) {
-  //     return pair.token0Price
-  //   } else if (pair.token1 == MONT_ADDRESS) {
-  //     return pair.token1Price
-  //   }
-  // }
 
   for (let i = 0; i < WHITELIST.length; ++i) {
     let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
@@ -122,6 +112,21 @@ export function findMntPerToken(token: Token): BigDecimal {
   }
 
   return ZERO_BD
+}
+
+export function getVolumeMNT(
+  tokenAmount0: BigDecimal,
+  token0: Token,
+  tokenAmount1: BigDecimal,
+  token1: Token,
+  pair: Pair
+): BigDecimal {
+  return pair.volumeToken0
+    .times(token0.mnt)
+    .plus(pair.volumeToken1.times(token1.mnt))
+    .div(BigDecimal.fromString('2'))
+
+  // return ONE_BD
 }
 
 /**

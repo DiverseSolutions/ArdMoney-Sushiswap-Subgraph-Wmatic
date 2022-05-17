@@ -17,7 +17,8 @@ import {
   findEthPerToken,
   getTrackedVolumeUSD,
   getTrackedLiquidityUSD,
-  findMntPerToken
+  findMntPerToken,
+  getVolumeMNT
 } from './pricing'
 import {
   convertTokenToDecimal,
@@ -459,6 +460,9 @@ export function handleSwap(event: Swap): void {
   pair.volumeToken1 = pair.volumeToken1.plus(amount1Total)
   pair.untrackedVolumeUSD = pair.untrackedVolumeUSD.plus(derivedAmountUSD)
   pair.txCount = pair.txCount.plus(ONE_BI)
+
+  pair.volumeMNT = getVolumeMNT(amount0Total, token0 as Token, amount1Total, token1 as Token, pair as Pair)
+
   pair.save()
 
   // update global values, only used tracked amounts for volume
