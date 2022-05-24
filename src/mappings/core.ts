@@ -331,6 +331,7 @@ export function handleMint(event: Mint): void {
   mint.amount1 = token1Amount as BigDecimal
   mint.logIndex = event.logIndex
   mint.amountUSD = amountTotalUSD as BigDecimal
+  mint.amountMNT = token0Amount.times(token0.mnt).plus(token1Amount.times(token1.mnt))
   mint.save()
 
   // update the LP position
@@ -393,6 +394,7 @@ export function handleBurn(event: Burn): void {
   // burn.to = event.params.to
   burn.logIndex = event.logIndex
   burn.amountUSD = amountTotalUSD as BigDecimal
+  burn.amountMNT = token1.mnt.plus(token0.mnt)
   burn.save()
 
   // update the LP position
@@ -432,6 +434,7 @@ export function handleSwap(event: Swap): void {
 
   // only accounts for volume through white listed tokens
   let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, token0 as Token, amount1Total, token1 as Token, pair as Pair)
+  let volumeMNT = getVolumeMNT(amount0Total, token0 as Token, amount1Total, token1 as Token, pair as Pair)
 
   let trackedAmountETH: BigDecimal
   if (bundle.ethPrice.equals(ZERO_BD)) {
@@ -443,11 +446,13 @@ export function handleSwap(event: Swap): void {
   // update token0 global volume and token liquidity stats
   token0.tradeVolume = token0.tradeVolume.plus(amount0In.plus(amount0Out))
   token0.tradeVolumeUSD = token0.tradeVolumeUSD.plus(trackedAmountUSD)
+  token0.tradeVolumeMNT = token0.tradeVolumeMNT.plus(volumeMNT)
   token0.untrackedVolumeUSD = token0.untrackedVolumeUSD.plus(derivedAmountUSD)
 
   // update token1 global volume and token liquidity stats
   token1.tradeVolume = token1.tradeVolume.plus(amount1In.plus(amount1Out))
   token1.tradeVolumeUSD = token1.tradeVolumeUSD.plus(trackedAmountUSD)
+  token1.tradeVolumeMNT = token1.tradeVolumeMNT.plus(volumeMNT)
   token1.untrackedVolumeUSD = token1.untrackedVolumeUSD.plus(derivedAmountUSD)
 
   // update txn counts
@@ -510,6 +515,7 @@ export function handleSwap(event: Swap): void {
   swap.logIndex = event.logIndex
   // use the tracked amount if we have it
   swap.amountUSD = trackedAmountUSD === ZERO_BD ? derivedAmountUSD : trackedAmountUSD
+  swap.amountMNT = volumeMNT
   swap.save()
 
   // update the transaction
@@ -551,6 +557,7 @@ export function handleSwap(event: Swap): void {
   token0DayData.dailyVolumeUSD = token0DayData.dailyVolumeUSD.plus(
     amount0Total.times(token0.derivedETH as BigDecimal).times(bundle.ethPrice)
   )
+  token0DayData.dailyVolumeMNT = token0DayData.dailyVolumeMNT.plus(amount0Total.times(token0.mnt))
   token0DayData.save()
 
   // swap specific updating
@@ -559,5 +566,6 @@ export function handleSwap(event: Swap): void {
   token1DayData.dailyVolumeUSD = token1DayData.dailyVolumeUSD.plus(
     amount1Total.times(token1.derivedETH as BigDecimal).times(bundle.ethPrice)
   )
+  token1DayData.dailyVolumeMNT = token1DayData.dailyVolumeMNT.plus(amount1Total.times(token1.mnt))
   token1DayData.save()
 }

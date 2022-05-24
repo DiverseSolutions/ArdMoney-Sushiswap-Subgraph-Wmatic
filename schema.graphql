@@ -55,6 +55,7 @@ type Token @entity {
 
   # mnt
   mnt: BigDecimal!
+  tradeVolumeMNT: BigDecimal!
 }
 
 type Pair @entity {
@@ -171,6 +172,9 @@ type Mint @entity {
   # optional fee fields, if a Transfer event is fired in _mintFee
   feeTo: Bytes
   feeLiquidity: BigDecimal
+
+  # mnt
+  amountMNT: BigDecimal
 }
 
 type Burn @entity {
@@ -198,6 +202,9 @@ type Burn @entity {
   # optional fee fields, if a Transfer event is fired in _mintFee
   feeTo: Bytes
   feeLiquidity: BigDecimal
+
+  # mnt
+  amountMNT: BigDecimal
 }
 
 type Swap @entity {
@@ -219,6 +226,9 @@ type Swap @entity {
 
   # derived info
   amountUSD: BigDecimal!
+
+  # mnt
+  amountMNT: BigDecimal!
 }
 
 # stores for USD calculations
@@ -309,4 +319,9 @@ type TokenDayData @entity {
 
   # price stats
   priceUSD: BigDecimal!
+
+  # mnt
+  priceMNT: BigDecimal!
+  dailyVolumeMNT: BigDecimal!
+  totalLiquidityMNT: BigDecimal!
 }

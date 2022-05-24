@@ -111,11 +111,18 @@ export function updateTokenDayData(token: Token, event: EthereumEvent): TokenDay
     tokenDayData.dailyVolumeUSD = ZERO_BD
     tokenDayData.dailyTxns = ZERO_BI
     tokenDayData.totalLiquidityUSD = ZERO_BD
+
+    // mnt
+    tokenDayData.priceMNT = token.mnt
+    tokenDayData.dailyVolumeMNT = ZERO_BD
+    tokenDayData.totalLiquidityMNT = ZERO_BD
   }
   tokenDayData.priceUSD = token.derivedETH.times(bundle.ethPrice)
+  tokenDayData.priceMNT = token.mnt
   tokenDayData.totalLiquidityToken = token.totalLiquidity
   tokenDayData.totalLiquidityETH = token.totalLiquidity.times(token.derivedETH as BigDecimal)
   tokenDayData.totalLiquidityUSD = tokenDayData.totalLiquidityETH.times(bundle.ethPrice)
+  tokenDayData.totalLiquidityMNT = token.totalLiquidity.times(token.mnt)
   tokenDayData.dailyTxns = tokenDayData.dailyTxns.plus(ONE_BI)
   tokenDayData.save()
 
